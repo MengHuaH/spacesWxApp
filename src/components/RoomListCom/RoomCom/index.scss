@@ -1,0 +1,32 @@
+.my_roomCom {
+    height: 200px;
+    background-color: #fff;
+    border-radius: 12px;
+    padding: 20px;
+    margin-top: 10px;
+}
+
+.roomName text{
+    font-weight: bolder;
+}
+
+.my_roomCom image{
+    width: 150px;
+    height: 200px;
+}
+.roomMoney{
+    margin-top: 110px;
+}
+
+.roomMoney_f, .roomMoney_m, .roomMoney_h{
+    color: #ffbd27;
+}
+.roomMoney_m{
+    font-size: 50rpx;
+}
+.room_ydbtn{
+    margin-top: 150px;
+    height: 60px;
+    border-radius: 50px;
+    line-height: 60px;
+}
