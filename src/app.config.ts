@@ -5,6 +5,7 @@ export default defineAppConfig({
     'pages/user/index',
     'pages/user/login/index',
     'pages/index/predetermine/index',
+    'pages/index/placeAnOrder/index',
     'pages/user/commonProblem/index',
   ],
   tabBar: {

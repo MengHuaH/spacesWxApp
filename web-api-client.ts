@@ -13,7 +13,7 @@ import type { AxiosInstance, AxiosRequestConfig, AxiosResponse, CancelToken } fr
 
 export interface IOrderGoodsClient {
     getOrderGoodsWithPagination(roomId: number | null | undefined, phoneNumber: number | null | undefined, pageNumber: number, pageSize: number): Promise<PaginatedListOfOrderGoodsListDto>;
-    createOrderGoods(command: CreateOrderGoodsCommand): Promise<number>;
+    createOrderGoods(command: CreateOrderGoodsCommand): Promise<OrderGoodsDto>;
     deleteOrderGoods(id: number): Promise<void>;
 }
 
@@ -90,7 +90,7 @@ export class OrderGoodsClient implements IOrderGoodsClient {
         return Promise.resolve<PaginatedListOfOrderGoodsListDto>(null as any);
     }
 
-    createOrderGoods(command: CreateOrderGoodsCommand, cancelToken?: CancelToken): Promise<number> {
+    createOrderGoods(command: CreateOrderGoodsCommand, cancelToken?: CancelToken): Promise<OrderGoodsDto> {
         let url_ = this.baseUrl + "/api/OrderGoods";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -118,7 +118,7 @@ export class OrderGoodsClient implements IOrderGoodsClient {
         });
     }
 
-    protected processCreateOrderGoods(response: AxiosResponse): Promise<number> {
+    protected processCreateOrderGoods(response: AxiosResponse): Promise<OrderGoodsDto> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -132,15 +132,14 @@ export class OrderGoodsClient implements IOrderGoodsClient {
             const _responseText = response.data;
             let result200: any = null;
             let resultData200  = _responseText;
-                result200 = resultData200 !== undefined ? resultData200 : <any>null;
-    
-            return Promise.resolve<number>(result200);
+            result200 = OrderGoodsDto.fromJS(resultData200);
+            return Promise.resolve<OrderGoodsDto>(result200);
 
         } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
-        return Promise.resolve<number>(null as any);
+        return Promise.resolve<OrderGoodsDto>(null as any);
     }
 
     deleteOrderGoods(id: number, cancelToken?: CancelToken): Promise<void> {
@@ -2027,6 +2026,7 @@ export class Room implements IRoom {
     id?: number;
     name?: string | undefined;
     money?: number;
+    clientId?: string | undefined;
     state?: RoomState;
     personnelSituation?: RoomPersonnelSituation;
     powerSupply?: RoomPowerSupply;
@@ -2046,6 +2046,7 @@ export class Room implements IRoom {
             this.id = _data["id"];
             this.name = _data["name"];
             this.money = _data["money"];
+            this.clientId = _data["clientId"];
             this.state = _data["state"];
             this.personnelSituation = _data["personnelSituation"];
             this.powerSupply = _data["powerSupply"];
@@ -2069,6 +2070,7 @@ export class Room implements IRoom {
         data["id"] = this.id;
         data["name"] = this.name;
         data["money"] = this.money;
+        data["clientId"] = this.clientId;
         data["state"] = this.state;
         data["personnelSituation"] = this.personnelSituation;
         data["powerSupply"] = this.powerSupply;
@@ -2085,6 +2087,7 @@ export interface IRoom {
     id?: number;
     name?: string | undefined;
     money?: number;
+    clientId?: string | undefined;
     state?: RoomState;
     personnelSituation?: RoomPersonnelSituation;
     powerSupply?: RoomPowerSupply;
@@ -2092,18 +2095,19 @@ export interface IRoom {
 }
 
 export enum RoomState {
-    Open = 0,
-    Closed = 1,
+    Closed = 0,
+    Appointment = 1,
+    Open = 2,
 }
 
 export enum RoomPersonnelSituation {
-    Have = 0,
-    Not = 1,
+    Not = 0,
+    Have = 1,
 }
 
 export enum RoomPowerSupply {
-    Open = 0,
-    Closed = 1,
+    Closed = 0,
+    Open = 1,
 }
 
 export class OrderGoods implements IOrderGoods {
@@ -2111,6 +2115,8 @@ export class OrderGoods implements IOrderGoods {
     orderId?: number;
     roomId?: number;
     userId?: number;
+    duration?: number;
+    orderStatus?: OrderGoodsState;
     room?: Room;
     user?: Users;
     startingTime?: Date;
@@ -2132,6 +2138,8 @@ export class OrderGoods implements IOrderGoods {
             this.orderId = _data["orderId"];
             this.roomId = _data["roomId"];
             this.userId = _data["userId"];
+            this.duration = _data["duration"];
+            this.orderStatus = _data["orderStatus"];
             this.room = _data["room"] ? Room.fromJS(_data["room"]) : <any>undefined;
             this.user = _data["user"] ? Users.fromJS(_data["user"]) : <any>undefined;
             this.startingTime = _data["startingTime"] ? new Date(_data["startingTime"].toString()) : <any>undefined;
@@ -2153,6 +2161,8 @@ export class OrderGoods implements IOrderGoods {
         data["orderId"] = this.orderId;
         data["roomId"] = this.roomId;
         data["userId"] = this.userId;
+        data["duration"] = this.duration;
+        data["orderStatus"] = this.orderStatus;
         data["room"] = this.room ? this.room.toJSON() : <any>undefined;
         data["user"] = this.user ? this.user.toJSON() : <any>undefined;
         data["startingTime"] = this.startingTime ? this.startingTime.toISOString() : <any>undefined;
@@ -2167,11 +2177,20 @@ export interface IOrderGoods {
     orderId?: number;
     roomId?: number;
     userId?: number;
+    duration?: number;
+    orderStatus?: OrderGoodsState;
     room?: Room;
     user?: Users;
     startingTime?: Date;
     endTime?: Date;
     createdDate?: Date;
+}
+
+export enum OrderGoodsState {
+    Finish = 0,
+    Start = 1,
+    NotStarted = 2,
+    Cancel = 3,
 }
 
 export class Users implements IUsers {
@@ -2234,9 +2253,50 @@ export interface IUsers {
     orderGoods?: OrderGoods[] | undefined;
 }
 
+export class OrderGoodsDto implements IOrderGoodsDto {
+    state?: string | undefined;
+    id?: number;
+
+    constructor(data?: IOrderGoodsDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.state = _data["state"];
+            this.id = _data["id"];
+        }
+    }
+
+    static fromJS(data: any): OrderGoodsDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new OrderGoodsDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["state"] = this.state;
+        data["id"] = this.id;
+        return data;
+    }
+}
+
+export interface IOrderGoodsDto {
+    state?: string | undefined;
+    id?: number;
+}
+
 export class CreateOrderGoodsCommand implements ICreateOrderGoodsCommand {
     room?: Room;
     user?: Users;
+    duration?: number;
     startingTime?: Date;
     endTime?: Date;
     createdDate?: Date;
@@ -2254,6 +2314,7 @@ export class CreateOrderGoodsCommand implements ICreateOrderGoodsCommand {
         if (_data) {
             this.room = _data["room"] ? Room.fromJS(_data["room"]) : <any>undefined;
             this.user = _data["user"] ? Users.fromJS(_data["user"]) : <any>undefined;
+            this.duration = _data["duration"];
             this.startingTime = _data["startingTime"] ? new Date(_data["startingTime"].toString()) : <any>undefined;
             this.endTime = _data["endTime"] ? new Date(_data["endTime"].toString()) : <any>undefined;
             this.createdDate = _data["createdDate"] ? new Date(_data["createdDate"].toString()) : <any>undefined;
@@ -2271,6 +2332,7 @@ export class CreateOrderGoodsCommand implements ICreateOrderGoodsCommand {
         data = typeof data === 'object' ? data : {};
         data["room"] = this.room ? this.room.toJSON() : <any>undefined;
         data["user"] = this.user ? this.user.toJSON() : <any>undefined;
+        data["duration"] = this.duration;
         data["startingTime"] = this.startingTime ? this.startingTime.toISOString() : <any>undefined;
         data["endTime"] = this.endTime ? this.endTime.toISOString() : <any>undefined;
         data["createdDate"] = this.createdDate ? this.createdDate.toISOString() : <any>undefined;
@@ -2281,6 +2343,7 @@ export class CreateOrderGoodsCommand implements ICreateOrderGoodsCommand {
 export interface ICreateOrderGoodsCommand {
     room?: Room;
     user?: Users;
+    duration?: number;
     startingTime?: Date;
     endTime?: Date;
     createdDate?: Date;
@@ -2353,6 +2416,7 @@ export interface IPaginatedListOfRoom {
 export class CreateRoomCommand implements ICreateRoomCommand {
     name?: string;
     money?: number;
+    clientId?: string;
     state?: RoomState;
     personnelSituation?: RoomPersonnelSituation;
     powerSupply?: RoomPowerSupply;
@@ -2370,6 +2434,7 @@ export class CreateRoomCommand implements ICreateRoomCommand {
         if (_data) {
             this.name = _data["name"];
             this.money = _data["money"];
+            this.clientId = _data["clientId"];
             this.state = _data["state"];
             this.personnelSituation = _data["personnelSituation"];
             this.powerSupply = _data["powerSupply"];
@@ -2387,6 +2452,7 @@ export class CreateRoomCommand implements ICreateRoomCommand {
         data = typeof data === 'object' ? data : {};
         data["name"] = this.name;
         data["money"] = this.money;
+        data["clientId"] = this.clientId;
         data["state"] = this.state;
         data["personnelSituation"] = this.personnelSituation;
         data["powerSupply"] = this.powerSupply;
@@ -2397,6 +2463,7 @@ export class CreateRoomCommand implements ICreateRoomCommand {
 export interface ICreateRoomCommand {
     name?: string;
     money?: number;
+    clientId?: string;
     state?: RoomState;
     personnelSituation?: RoomPersonnelSituation;
     powerSupply?: RoomPowerSupply;
@@ -2406,6 +2473,7 @@ export class UpdateRoomCommand implements IUpdateRoomCommand {
     id?: number;
     name?: string;
     money?: number;
+    clientId?: string;
     state?: RoomState;
     personnelSituation?: RoomPersonnelSituation;
     powerSupply?: RoomPowerSupply;
@@ -2424,6 +2492,7 @@ export class UpdateRoomCommand implements IUpdateRoomCommand {
             this.id = _data["id"];
             this.name = _data["name"];
             this.money = _data["money"];
+            this.clientId = _data["clientId"];
             this.state = _data["state"];
             this.personnelSituation = _data["personnelSituation"];
             this.powerSupply = _data["powerSupply"];
@@ -2442,6 +2511,7 @@ export class UpdateRoomCommand implements IUpdateRoomCommand {
         data["id"] = this.id;
         data["name"] = this.name;
         data["money"] = this.money;
+        data["clientId"] = this.clientId;
         data["state"] = this.state;
         data["personnelSituation"] = this.personnelSituation;
         data["powerSupply"] = this.powerSupply;
@@ -2453,6 +2523,7 @@ export interface IUpdateRoomCommand {
     id?: number;
     name?: string;
     money?: number;
+    clientId?: string;
     state?: RoomState;
     personnelSituation?: RoomPersonnelSituation;
     powerSupply?: RoomPowerSupply;

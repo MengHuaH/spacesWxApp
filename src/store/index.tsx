@@ -5,11 +5,13 @@ import type { TypedUseSelectorHook } from 'react-redux'
 
 import counterReducer from "../features/counter/counterSlice";
 import userReducer from '../features/user/user';
+import roomReducer from '../features/room/room';
 
 const store = configureStore({
   reducer: {
     counter: counterReducer,
-    user:userReducer
+    user:userReducer,
+    room:roomReducer,
   },
 });
 export type IRootState = ReturnType<typeof store.getState>

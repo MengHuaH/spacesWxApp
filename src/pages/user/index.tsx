@@ -62,7 +62,7 @@ export default function Index() {
       }))
     })
   }
-
+ console.log(userInfo)
   return (
     <View className='user'>
       <Card>
