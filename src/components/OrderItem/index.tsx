@@ -42,7 +42,7 @@ function OrderItem({ data, className = '' }) {
     function toRoom() {
         if (data.orderStatus == 1 || (data.orderStatus == 2 && data.endTime > new Date())) {
             Taro.redirectTo({
-                url: '../index/roomControl/index?orderId='+data.orderId,
+                url: '../../pagesA/index/roomControl/index?orderId='+data.orderId,
             })
         }
     }

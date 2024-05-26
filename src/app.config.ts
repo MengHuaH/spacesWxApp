@@ -1,18 +1,23 @@
 export default defineAppConfig({
   pages: [
-    'pages/order/index',
     'pages/index/index',
-    'pages/index/roomControl/index',
+    'pages/order/index',
     'pages/user/index',
-    'pages/user/commonProblem/index',
-    'pages/user/login/index',
   ],
-  "subpackages":[
+  "subpackages": [
     {
       "root": "pagesA",
       "pages": [
         'index/predetermine/index',
         'index/placeAnOrder/index',
+        'index/roomControl/index',
+      ]
+    },
+    {
+      "root": "pagesB",
+      "pages": [
+        'user/commonProblem/index',
+        'user/login/index',
       ]
     }
   ],
@@ -23,20 +28,20 @@ export default defineAppConfig({
     list: [
       {
         pagePath: 'pages/index/index',
-        selectedIconPath:'icon/home.png',
-        iconPath:'icon/home_on.png',
+        selectedIconPath: 'icon/home.png',
+        iconPath: 'icon/home_on.png',
         text: '',
       },
       {
         pagePath: 'pages/order/index',
-        selectedIconPath:'icon/order.png',
-        iconPath:'icon/order_on.png',
+        selectedIconPath: 'icon/order.png',
+        iconPath: 'icon/order_on.png',
         text: '',
       },
       {
         pagePath: 'pages/user/index',
-        selectedIconPath:'icon/user.png',
-        iconPath:'icon/user_on.png',
+        selectedIconPath: 'icon/user.png',
+        iconPath: 'icon/user_on.png',
         text: '',
       },
     ],
@@ -46,6 +51,6 @@ export default defineAppConfig({
     navigationBarBackgroundColor: '#fff',
     navigationBarTitleText: 'WeChat',
     navigationBarTextStyle: 'black',
-    backgroundColor:'#101010'
+    backgroundColor: '#101010'
   }
 })

@@ -1,7 +1,7 @@
 import { View, Text, ScrollView } from '@tarojs/components'
 import Taro, { useLoad } from '@tarojs/taro'
 import './index.scss'
-import { useReducer, useEffect } from "react";
+import { useReducer, useEffect, useState } from "react";
 import { changer_user } from '../../../features/user/user';
 import { useAppSelector, useAppDispatch } from '../../../store';
 import { DateDay, Card } from '../../../components';
@@ -21,6 +21,9 @@ const initialState = {
   timeList: [],
   startingHours: null,
 }
+
+var ws = "ws://101.33.233.99:4880";
+var opts = { username: "admin", password: "mhh1112", port: 8083 }
 
 
 function reducer(state, action) {
@@ -57,6 +60,7 @@ function reducer(state, action) {
 
 
 export default function Index() {
+  const [scoket, setScoket] = useState(null)
   const roomInfo = useAppSelector((state) => state.room.roomInfo);
   const userInfo = useAppSelector((state) => state.user.userInfo);
 
@@ -93,7 +97,7 @@ export default function Index() {
 
   function setTime(res) {
     var date = new Date()
-    var newTimeList: Object[] = []
+    var newTimeList = []
     if (onDate.getDate() == date.getDate()) {
       for (let i = 0; i < 23 - date.getHours(); i++) {
         newTimeList.push({
@@ -135,9 +139,16 @@ export default function Index() {
     await client.createOrderGoods(value)
       .then(res => {
         Taro.redirectTo({
-          url:'../../../pages/index/roomControl/index?orderId='+res.state
+          url:'../roomControl/index?orderId='+res.state
         })
-
+        console.log(roomInfo)
+        var data = {
+          type: 'LED',
+          topic: roomInfo.clientId,
+          data: 'YYDD'
+        }
+        console.log(scoket)
+        scoket?.send({ data: JSON.stringify(data) })
         // dispatchRedux(changer_user({
         //   phoneNumber: userInfo.phoneNumber,
         //   nickName: userInfo.nickName,
@@ -232,6 +243,40 @@ export default function Index() {
   useEffect(() => {
     getOrderList()
   }, [onDate])
+  useEffect(() => {
+    var closeTask
+    Taro.connectSocket({
+      url: ws,
+      success: function (e) {
+        console.log('connect success')
+      }
+    }).then((task) => {
+      setScoket(task)
+      closeTask = task
+      task.onOpen(function () {
+        console.log('onOpen')
+      })
+      task?.onMessage(function (msg) {
+        
+      })
+      task?.onError(function () {
+        console.log('onError')
+      })
+      task.onClose(function (e) {
+        console.log('onClose: ', e)
+      })
+    })
+
+
+    return () => {
+      // 组件卸载时断开连接
+      //client.end();
+      // newTask.onClose(function (e) {
+      //   console.log('onClose: ', e)
+      // })
+      Taro.closeSocket()
+    };
+  }, []);
 
 
   return (

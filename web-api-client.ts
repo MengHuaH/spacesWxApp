@@ -28,7 +28,7 @@ export class OrderGoodsClient implements IOrderGoodsClient {
 
         this.instance = instance || axios.create();
 
-        this.baseUrl = baseUrl ?? "https://172.27.110.74:5001";
+        this.baseUrl = baseUrl ?? "http://101.33.233.99:5000";
 
     }
 
@@ -322,7 +322,7 @@ export class RoomClient implements IRoomClient {
 
         this.instance = instance || axios.create();
 
-        this.baseUrl = baseUrl ?? "https://172.27.110.74:5001";
+        this.baseUrl = baseUrl ?? "http://101.33.233.99:5000";
 
     }
 
@@ -606,7 +606,7 @@ export class TodoItemsClient implements ITodoItemsClient {
 
         this.instance = instance || axios.create();
 
-        this.baseUrl = baseUrl ?? "https://172.27.110.74:5001";
+        this.baseUrl = baseUrl ?? "http://101.33.233.99:5000";
 
     }
 
@@ -889,7 +889,7 @@ export class TodoListsClient implements ITodoListsClient {
 
         this.instance = instance || axios.create();
 
-        this.baseUrl = baseUrl ?? "https://172.27.110.74:5001";
+        this.baseUrl = baseUrl ?? "http://101.33.233.99:5000";
 
     }
 
@@ -1111,7 +1111,7 @@ export class UserClient implements IUserClient {
 
         this.instance = instance || axios.create();
 
-        this.baseUrl = baseUrl ?? "https://172.27.110.74:5001";
+        this.baseUrl = baseUrl ?? "http://101.33.233.99:5000";
 
     }
 
@@ -1441,7 +1441,7 @@ export class UsersClient implements IUsersClient {
 
         this.instance = instance || axios.create();
 
-        this.baseUrl = baseUrl ?? "https://172.27.110.74:5001";
+        this.baseUrl = baseUrl ?? "http://101.33.233.99:5000";
 
     }
 
@@ -2015,7 +2015,7 @@ export class WeatherForecastsClient implements IWeatherForecastsClient {
 
         this.instance = instance || axios.create();
 
-        this.baseUrl = baseUrl ?? "https://172.27.110.74:5001";
+        this.baseUrl = baseUrl ?? "http://101.33.233.99:5000";
 
     }
 

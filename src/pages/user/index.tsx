@@ -47,7 +47,7 @@ export default function Index() {
 
   function login() {
     Taro.navigateTo({
-      url: './login/index',
+      url: '../../pagesB/user/login/index',
     })
   }
 
@@ -102,7 +102,7 @@ export default function Index() {
         title='我的工具'
       >
         <View className='at-row tools'>
-          <View className='at-col at-col-3' onClick={() => Taro.navigateTo({url: './commonProblem/index',})}>
+          <View className='at-col at-col-3' onClick={() => Taro.navigateTo({url: '../../pagesB/user/commonProblem/index',})}>
             <View><AtIcon value='file-generic' size='30' color='#000'></AtIcon></View>
             <View><Text>常见问题</Text></View>
           </View>
