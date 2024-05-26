@@ -13,7 +13,7 @@ export default function Index() {
         <View>
           <View className='yd_col'><Text style={{ fontSize: '24px', fontWeight: 'bolder' }}>自助预定</Text></View>
           <View className='yd_col yd_btn_view'>
-            <AtButton type='primary' className='yd_btn' onClick={() => { Taro.navigateTo({ url: './predetermine/index' }) }}>预定</AtButton>
+            <AtButton type='primary' className='yd_btn' onClick={() => { Taro.navigateTo({ url: '../../pagesA/index/predetermine/index' }) }}>预定</AtButton>
           </View>
           <View>
             <AtButton type='primary' className='yd_btn_phone' onClick={makePhone}><AtIcon value='phone'></AtIcon></AtButton>

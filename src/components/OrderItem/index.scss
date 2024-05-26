@@ -1,0 +1,35 @@
+.orderItem{
+    background-color: #fff;
+}
+.roomName{
+    height: 50px;
+    line-height: 50px;
+    font-size: 50px;
+}
+.tag{
+    text-align: right;
+}
+.wks{
+    background-color: rgb(0, 225, 255);
+}
+.yks{
+    background-color: rgb(0, 255, 0);
+}
+.yjs{
+    background-color: rgb(228, 228, 228);
+}
+
+.time{
+    margin-top: 40px;
+    width: 100%;
+    padding: 20px 0px;
+    border-radius: 8px;
+}
+.time .at-col view{
+    text-align: center;
+}
+.divider{
+    width: 100%;
+    margin-top: 10px;
+    border-top: 8px dotted #000;
+}

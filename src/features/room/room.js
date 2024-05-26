@@ -9,7 +9,6 @@ export const roomSlice = createSlice({
             id: 0,
             money: 0,
             name: "",
-            orderGoods: undefined,
             personnelSituation: 0,
             powerSupply: 0,
             state: 0,

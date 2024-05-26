@@ -1,12 +1,20 @@
 export default defineAppConfig({
   pages: [
-    'pages/index/index',
     'pages/order/index',
+    'pages/index/index',
+    'pages/index/roomControl/index',
     'pages/user/index',
-    'pages/user/login/index',
-    'pages/index/predetermine/index',
-    'pages/index/placeAnOrder/index',
     'pages/user/commonProblem/index',
+    'pages/user/login/index',
+  ],
+  "subpackages":[
+    {
+      "root": "pagesA",
+      "pages": [
+        'index/predetermine/index',
+        'index/placeAnOrder/index',
+      ]
+    }
   ],
   tabBar: {
     color: '#000000',

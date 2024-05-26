@@ -9,7 +9,7 @@ function Card({ children, className = '', type = '', title='', style={} }) {
         case 'title':
             return (
                 <View className={'my_view my_view_title ' + className} style={style}>
-                    <LeftBorder>{title}</LeftBorder>
+                    <LeftBorder className='title'>{title}</LeftBorder>
                     {children}
                 </View>
             )

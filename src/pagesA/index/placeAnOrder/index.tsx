@@ -2,10 +2,11 @@ import { View, Text, ScrollView } from '@tarojs/components'
 import Taro, { useLoad } from '@tarojs/taro'
 import './index.scss'
 import { useReducer, useEffect } from "react";
-import { useAppSelector } from '../../../store';
+import { changer_user } from '../../../features/user/user';
+import { useAppSelector, useAppDispatch } from '../../../store';
 import { DateDay, Card } from '../../../components';
 import { AtButton } from 'taro-ui';
-import { Room, Users, OrderGoodsClient } from 'web-api-client';
+import { Room, Users, OrderGoodsClient } from '../../../../web-api-client';
 
 const initialState = {
   order: {
@@ -60,7 +61,8 @@ export default function Index() {
   const userInfo = useAppSelector((state) => state.user.userInfo);
 
   const [state, dispatch] = useReducer(reducer, initialState)
-  const { duration, onDate, timeList, startingHours, order, toast } = state
+  const dispatchRedux = useAppDispatch();
+  const { duration, onDate, timeList, startingHours } = state
 
   //返回到店日期和时长
   function setStartingTime(newduration, onDate) {
@@ -69,17 +71,35 @@ export default function Index() {
   }
 
   function changedButton(value) {
-    dispatch({ type: 'changed_startingHours', data: value })
+    var newDur = duration / 60 < 1 ? 1 : duration / 60
+    var disSta = true
+    for (let i = 0; i < newDur; i++) {
+      for (let ii = 0; ii < timeList.length; ii++) {
+        if (timeList[ii].time == value + i) {
+          if (timeList[ii].disabled) disSta = false
+        }
+      }
+    }
+    if (disSta) { 
+      dispatch({ type: 'changed_startingHours', data: value }) 
+    } else { 
+      Taro.showToast({
+        title: '当前时间不可选',
+        icon: 'none',
+        duration: 3000
+      })
+    }
   }
 
-  function setTime() {
+  function setTime(res) {
     var date = new Date()
     var newTimeList: Object[] = []
     if (onDate.getDate() == date.getDate()) {
       for (let i = 0; i < 23 - date.getHours(); i++) {
         newTimeList.push({
           text: ('0' + (date.getHours() + 1 + i)).slice(-2) + ':00',
-          time: date.getHours() + 1 + i
+          time: date.getHours() + 1 + i,
+          key: date.toLocaleDateString() + ('0' + (date.getHours() + 1 + i)).slice(-2) + ':00'
         })
       }
     }
@@ -87,10 +107,25 @@ export default function Index() {
       for (let i = 0; i < 24; i++) {
         newTimeList.push({
           text: ('0' + i).slice(-2) + ':00',
-          time: i
+          time: i,
+          key: onDate.toLocaleDateString() + ('0' + i).slice(-2) + ':00'
         })
       }
     }
+    for (let i = 0; i < res.length; i++) {
+      var h = res[i].duration / 60
+      var startime = res[i].startingTime
+      for (let ii = 0; ii < h; ii++) {
+        var a = new Date(startime.setHours(startime.getHours() + (ii==0?0:1)))
+        for (let iii = 0; iii < newTimeList.length; iii++) {
+          if (newTimeList[iii]['key'] == a.toLocaleDateString() + ('0' + a.getHours()).slice(-2) + ':00') {
+            newTimeList[iii]['disabled'] = true
+            newTimeList[iii]['text'] = '已售'
+          }
+        }
+      }
+    }
+    //console.log(newTimeList)
     dispatch({ type: 'changed_timeList', data: newTimeList })
   }
 
@@ -98,7 +133,17 @@ export default function Index() {
   async function postOrderClient(value) {
     var client = new OrderGoodsClient()
     await client.createOrderGoods(value)
-      .then(() => {
+      .then(res => {
+        Taro.redirectTo({
+          url:'../../../pages/index/roomControl/index?orderId='+res.state
+        })
+
+        // dispatchRedux(changer_user({
+        //   phoneNumber: userInfo.phoneNumber,
+        //   nickName: userInfo.nickName,
+        //   avatarUrl: userInfo.avatarUrl,
+        //   money: userInfo.money - ((duration / 60) * roomInfo.money)
+        // }))
       })
       .catch(error => {
         Taro.showToast({
@@ -147,9 +192,10 @@ export default function Index() {
     newEndTime.setFullYear(onDate.getFullYear())
     newEndTime.setMonth(onDate.getMonth())
     newEndTime.setDate(onDate.getDate())
-    newEndTime.setHours(startingHours + 8 + (duration / 60))
-    newEndTime.setMinutes(0)
-    newEndTime.setSeconds(0)
+    newEndTime.setHours(startingHours + 8 + (duration / 60 < 1 ? 0 : (duration / 60) - 1))
+    newEndTime.setMinutes(59)
+    newEndTime.setSeconds(59)
+    var createTime = new Date()
     var newOrder = {
       room: roomInfo,
       user: new Users({
@@ -157,20 +203,36 @@ export default function Index() {
       }),
       startingTime: newstartingTime,//开始时间
       endTime: newEndTime,//结束时间
-      createdDate: new Date(),//创建时间
+      createdDate: new Date(createTime.setHours(createTime.getHours() + 8)),//创建时间
       duration: duration
     }
     postOrderClient(newOrder)
   }
 
+  async function getOrderList() {
+    var newdate = new Date()
+    newdate.setFullYear(onDate.getFullYear())
+    newdate.setMonth(onDate.getMonth())
+    newdate.setDate(onDate.getDate())
+    newdate.setHours(8)
+    newdate.setMinutes(0)
+    newdate.setSeconds(0)
+    var orderListClient = new OrderGoodsClient()
+    await orderListClient.getOrderGoodsQuery(roomInfo.id, null, 2, newdate).then(res => {
+      console.log(roomInfo.id,  newdate)
+      setTime(res)
+    })
+  }
+
 
   useLoad(() => {
-    setTime()
+    getOrderList()
   })
 
   useEffect(() => {
-    setTime()
-  }, [setStartingTime])
+    getOrderList()
+  }, [onDate])
+
 
   return (
     <View>
@@ -179,7 +241,7 @@ export default function Index() {
         <View className='at-row  at-row--wrap time_row'>
           {timeList.map((value, e) =>
             <View className='at-col at-col-4 time_col'>
-              <AtButton type={startingHours == value.time ? 'primary' : undefined} className='time_btn' onClick={() => changedButton(value.time)}>{value.text}</AtButton>
+              <AtButton disabled={value.disabled} type={startingHours == value.time ? 'primary' : undefined} className='time_btn' onClick={() => changedButton(value.time)}>{value.text}</AtButton>
             </View>
           )}
         </View>

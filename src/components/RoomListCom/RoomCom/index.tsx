@@ -14,7 +14,6 @@ function RoomListCom({ className = '', data }) {
             id: data.id,
             money: data.money,
             name: data.name,
-            orderGoods: data.orderGoods,
             personnelSituation: data.personnelSituation,
             powerSupply: data.powerSupply,
             state: data.state,
